@@ -20,6 +20,12 @@ app.post('/cache/:key', (req,res) => {
     const key = req.params.key 
     const value = req.body.value //takes request from user
     
+    if(!value){
+        res.status(400).json({
+            error: "Value is required"
+        })
+    }
+
     res.status(201).json({
         key: key,
         value: value
