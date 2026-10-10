@@ -6,6 +6,13 @@ const port = 5000
 
 app.use(express.json(0)) //enables json parsing (converting raw json string into native data objects)
 
+//custome middleware 
+app.use((req, res, next) => {
+    console.log(req.method, req.url); //logs the incoming request
+    next();
+}) 
+
+
 //req.params -> takes params from the url
 //req.query -> read url query paramaters
 //ttl -> how much time should a value live before it get's expired
