@@ -1,27 +1,41 @@
-//JS's inbuilt function to store data in key-value pair
+class cacheServer {
+    constructor(){
+        this.store = new Map()  
+    }
 
+    //will set data in the cache according to proper key
+    set(key, value){
+        this.store.set(key, value);
+        return true
+    }
 
-const cache = new Map()
+    //will get the key where data is stored in the cache
+    get(key){
+        if(!this.store.key(key)){
+            return undefined
+        }
 
-//store data
-cache.set("username", "Soham")
-cache.set("username", "Rahul")
-cache.set('age', 20)
+        return this.store.get(key)
+    }
 
+    //will checks weather key exists in the cache
+    has(key){
+        return this.store.has(key);
+    }
 
+    delete(key){
+        this.store.delete(key)
+    }
 
-//get data
-console.log(cache.get("username"));
+    
+    clear(){
+        return this.store.clear()
+    }
 
-//has -> checks key weather it exsists or not
-console.log(cache.has("username"));
+    //tells total number of entries
+    get size(){
+        return this.store.size;
+    }
+}
 
-console.log(cache.get("name"))
-console.log(cache.size);
-
-
-cache.delete("username")
-
-console.log(cache.size);
-
-
+export default cacheServer;

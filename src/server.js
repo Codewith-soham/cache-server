@@ -1,55 +1,74 @@
-import express from "express";
+import express from "express"
+import cacheServer from "./cache.js"
+import e from "express"
+const app = express()
 
-const app = express();
+const port = 3000 
+const cache = new cacheServer()
 
-const port = 5000
+app.use(express.json())
 
-app.use(express.json(0)) //enables json parsing (converting raw json string into native data objects)
+//store a value
+app.post("/cache/:key", (req,res) => {
+    const { key } = req.params;
+    const { value } = req.body;
 
-//custome middleware 
-app.use((req, res, next) => {
-    console.log(req.method, req.url); //logs the incoming request
-    next();
-}) 
+    if(!Object.hasOwn(req.body, "value")){
+         return res.status(400).json(
+            {
+                error: "Request body must contain a value"
+            }
+         )
+    }
 
+    cache.set(key, value);
 
-//req.params -> takes params from the url
-//req.query -> read url query paramaters
-//ttl -> how much time should a value live before it get's expired
-app.post('/cache/:key', (req,res) => {
-    const key = req.params.key 
-    const value = req.body.value //takes request from user
-    
-    if(!value){
-        res.status(400).json({
-            error: "Value is required"
+    res.json({
+        message: "Value stored",
+        key,
+        value
+    })
+})
+
+//retrival of data
+app.get("/cache/:key", (req,res) => {
+    const { key } = req.params;
+
+    if(!cache.has(key)){
+        return res.status(404).json({
+            error: "Cache miss",
+            key
         })
     }
 
-    res.status(201).json({
-        key: key,
-        value: value
+    cache.get(key, value)
+
+    res.json({
+        status: "HIT",
+        key,
+        value: cache.get(key)
     })
 })
 
+app.delete("/cache/:key", (req,res) => {
+    const deleted = cache.delete(req.paramss.key)
 
-app.get('/cache/:key', (req,res) => {
-    const key = req.params.key;
-    const ttl = req.query.ttl;
 
-    res.status(200).json({
-        key: key,
-        ttl: ttl
+    res.json({
+        deleted
     })
 })
 
+app.delete("/cache", (req,res) => {
+    cache.clear()
 
-app.get("/hello", (req,res) => {
-    res.status(200).json({
-        message: "hello from server"
+    res.json({
+        messaage: "cache cleared"
     })
 })
+
 
 app.listen(port, () => {
-    console.log(`Server running on ${port}`);
+    console.log(`Cache-Server listening on ${port}`);
+    
 })
