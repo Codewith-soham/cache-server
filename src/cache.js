@@ -1,30 +1,43 @@
 class cacheServer {
-    constructor(){
-        this.store = new Map()  
+    constructor(defaultTtlMs = 60000){ //ttl value set for 6s for each cache entry
+        this.store = new Map() 
+        this.defaultTtlMs = defaultTtlMs; 
     }
 
     //will set data in the cache according to proper key
-    set(key, value){
-        this.store.set(key, value);
+    set(key, value, ttlMs = this.defaultTtlMs){
+        const expiresAt = ttlMs? Date.now() + ttlMs : null //null -> never expires
+        this.store.set(key, {value, expiresAt});
         return true
     }
 
     //will get the key where data is stored in the cache
     get(key){
-        if(!this.store.has(key)){
+        const entry = this.store.get(key)
+        if(!entry) return undefined;
+        if(entry.expiresAt && Date.now() > entry.expiresAt){
+            this.store.delete(key);
             return undefined
         }
-
-        return this.store.get(key)
+        return entry.value;
     }
 
     //will checks weather key exists in the cache
     has(key){
+        const entry = this.store.has(key)
+        if(!entry) return undefined
+
+        if(entry.expiresAt && Date.now() > entry.expiresAt){
+            this.store.delete(key)
+        }
         return this.store.has(key);
     }
 
     delete(key){
-        this.store.delete(key)
+        if(!this.store.has(key)){
+            return "key is not present in the cache"
+        }
+        return this.store.delete(key)
     }
 
     
