@@ -1,6 +1,6 @@
 import express from "express"
 import cacheServer from "./cache.js"
-import e from "express"
+
 const app = express()
 
 const port = 3000 
@@ -41,8 +41,6 @@ app.get("/cache/:key", (req,res) => {
         })
     }
 
-    cache.get(key, value)
-
     res.json({
         status: "HIT",
         key,
@@ -51,7 +49,7 @@ app.get("/cache/:key", (req,res) => {
 })
 
 app.delete("/cache/:key", (req,res) => {
-    const deleted = cache.delete(req.paramss.key)
+    const deleted = cache.delete(req.params.key)
 
 
     res.json({
@@ -63,7 +61,16 @@ app.delete("/cache", (req,res) => {
     cache.clear()
 
     res.json({
-        messaage: "cache cleared"
+        message: "cache cleared"
+    })
+})
+
+app.get("/cache/size", (req,res) => {
+    const size = cache.size()
+
+    res.json({
+        message: "The size of the cache is",
+        size
     })
 })
 

@@ -11,7 +11,7 @@ class cacheServer {
 
     //will get the key where data is stored in the cache
     get(key){
-        if(!this.store.key(key)){
+        if(!this.store.has(key)){
             return undefined
         }
 
