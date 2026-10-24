@@ -11,7 +11,6 @@ app.use(express.json())
 //store a value
 app.post("/cache/:key", (req,res) => {
     const { key } = req.params;
-    const { value } = req.body;
 
     if(!Object.hasOwn(req.body, "value")){
          return res.status(400).json(
@@ -21,12 +20,23 @@ app.post("/cache/:key", (req,res) => {
          )
     }
 
-    cache.set(key, value);
+    const { value, ttl } = req.body;
+
+    let ttlMs;
+    if(ttlMs !== undefined){
+        if(typeof ttl !== "number" || Number.isFinite(ttl) || ttl <= 0){
+            return res.status(400).json({error: "ttl must be a postive number of seconds"})
+        }
+
+        ttlMs = ttl * 1000;
+    }
+    cache.set(key, value, ttlMs);
 
     res.json({
         message: "Value stored",
         key,
-        value
+        value,
+        ttl: ttl ?? cache.defaultTtlMs / 1000
     })
 })
 
@@ -65,8 +75,8 @@ app.delete("/cache", (req,res) => {
     })
 })
 
-app.get("/cache/size", (req,res) => {
-    const size = cache.size()
+app.get("/cache/stat", (req,res) => {
+    const size = cache.size
 
     res.json({
         message: "The size of the cache is",

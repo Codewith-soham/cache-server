@@ -1,5 +1,5 @@
 class cacheServer {
-    constructor(defaultTtlMs = 60000){ //ttl value set for 6s for each cache entry
+    constructor(defaultTtlMs = 6000){ //ttl value set for 6s for each cache entry
         this.store = new Map() 
         this.defaultTtlMs = defaultTtlMs; 
     }
@@ -24,7 +24,7 @@ class cacheServer {
 
     //will checks weather key exists in the cache
     has(key){
-        const entry = this.store.has(key)
+        const entry = this.store.get(key)
         if(!entry) return undefined
 
         if(entry.expiresAt && Date.now() > entry.expiresAt){
@@ -35,7 +35,7 @@ class cacheServer {
 
     delete(key){
         if(!this.store.has(key)){
-            return "key is not present in the cache"
+            return undefined
         }
         return this.store.delete(key)
     }
